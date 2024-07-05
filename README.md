@@ -1,6 +1,7 @@
 # UnGui
 UnGui is a lightweight, Dear ImGui-inspired GUI toolkit for Unity, designed to be used with BepInEx plugins. It simplifies the creation and management of UI elements in a window-based system, making it easy to build custom interfaces for your Unity projects.
 
+
 ## Features
 - Simple and intuitive API for creating and managing windows and UI elements.
 - Automatic layout management for sequentially placed elements.
@@ -13,6 +14,10 @@ UnGui is a lightweight, Dear ImGui-inspired GUI toolkit for Unity, designed to b
 
 ## Usage
 In your BepInEx plugin, use the UnGui class to create and manage your GUI elements. Below is an example plugin implementation:  
+
+<p align="center">
+<img src=https://github.com/NightFyre/UnGui/assets/80198020/afeed07e-fe97-48fc-99e4-e5ce702463b4">
+</p>
 
 ```c#
 using BepInEx;
@@ -40,20 +45,23 @@ public class YourModMan : MonoBehaviour
     {
         if (showMenu)
         {
-
+            //    Check if there is a currently active window / window creation event  
             UnGui.Window pWindow = UnGui.GetCurrentWindow();
             if (pWindow != null)
             {
+                //    update windowRect to match window class properties
                 windowRect.size = pWindow.windowRect.size;
 
                 //  update Window class variable
                 UnGui.SetWindowPos(windowRect.position);
 
+                //    Clamp menu to screen bounds
                 Vector2 pos = pWindow.windowRect.position;
                 if (UnGui.ClipWindowToScreenBounds(pWindow, ref pos))
                     windowRect.position = pos;
             }
 
+            //    Render Menu
             windowRect = GUI.Window(0, windowRect, DrawMenuWindow, PluginInfo.PLUGIN_NAME);
         }
     }
@@ -61,6 +69,7 @@ public class YourModMan : MonoBehaviour
     private bool bTestToggle = false;
     private void DrawMenuWindow(int windowID)
     {
+        //    Begin Window event , just like Dear ImGui
         //  Early exit if window creation / find fails
         if (!UnGui.Begin(windowID, PluginInfo.PLUGIN_NAME))
         {
@@ -68,17 +77,19 @@ public class YourModMan : MonoBehaviour
             return;
         }
 
+        //    Get window context
         UnGui.Window pWindow = UnGui.GetCurrentWindow();
-    
+
+        // Add your GUI elements here
+
+        //    Example Text
         UnGui.Text("This is text inside the window.");
         UnGui.Text("This is centered text inside the window.", true);
         UnGui.Text("This is colored text inside the window.", Color.green);
-
         UnGui.Text(windowRect.ToString());
-
         UnGui.Text(UnGui.GetCursorPos().ToString());
 
-        // Add your GUI elements here
+        //    Example Buttons
         if (UnGui.Button("Button 1"))
             Console.WriteLine("Button 1 clicked!");
 
@@ -91,13 +102,14 @@ public class YourModMan : MonoBehaviour
         UnGui.SetCursorPos(new Vector2(UnGui.GetContentRegionAvail().x - (szBtn.x - pWindow.padding), UnGui.GetCursorPos().y));
         if (UnGui.Button("Color Button", Color.cyan))
             Console.WriteLine("Color 3 clicked!");
-    
+
+        //    Example Toggle
         Menu.bTestToggle = UnGui.Toggle("Toggle", Menu.bTestToggle);
             
-        //  
+        //    End Window Event, just like Dear ImGui
         UnGui.End();
 
-        // Ensure the window is draggable
+        //     Ensure the window is draggable
         GUI.DragWindow(new Rect(0, 0, pWindow.windowRect.width, pWindow.windowRect.height));
     }
 }
